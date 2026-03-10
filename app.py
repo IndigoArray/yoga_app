@@ -135,10 +135,7 @@ else:
         st.write("**Planes of Movement:**", bio_row["planes_of_movement"])
     else:
         st.write("No biomechanics data available.")
-st.write("**Joint Actions:**", bio_row.get("joint_actions", "Not available"))
-st.write("**Muscles Activated:**", bio_row.get("muscles_activated", "Not available"))
-st.write("**Muscles Stretched:**", bio_row.get("muscles_stretched", "Not available"))
-st.write("**Planes of Movement:**", bio_row.get("planes_of_movement", "Not available"))
+
     # ---------------------------------------------------------
     # Sequencing
     # ---------------------------------------------------------
