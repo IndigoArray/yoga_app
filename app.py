@@ -123,18 +123,27 @@ else:
     # Display Pose Information
     # ---------------------------------------------------------
 
-   col1, col2 = st.columns([1, 2])
-    image_path = os.path.join("images", pose["image_path"])
-    with col1:
-    if os.path.exists(image_path):
-        st.image(image_path, width=300)
-    else:
-        st.info("Image not found. Add it to the images folder.")
+    # Create columns with 1:2 ratio
+col1, col2 = st.columns([1, 2])
 
+# Handle the image path
+image_path = os.path.join("images", pose["image_path"])
+
+with col1:
+    if os.path.exists(image_path):
+        # use_container_width makes it responsive and "cleaner" than a fixed 300px
+        st.image(image_path, use_container_width=True)
+    else:
+        st.info("📷 Image not found in /images folder.")
 
 with col2:
+    # Title and Sanskrit Name
     st.subheader(f"{pose['english_name']} | {pose['sanskrit_name']}")
-    st.info(f"**Level:** {pose['level']} | **Category:** {pose['category']}")
+    
+    # Using an 'info' box for metadata keeps it visually separated from the description
+    st.info(f"**Level:** {pose['level']}  |  **Category:** {pose['category']}")
+    
+    st.markdown("### Description")
     st.write(pose["description"])
 
 
