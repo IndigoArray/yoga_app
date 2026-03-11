@@ -103,15 +103,17 @@ if category_filter != "All":
 if level_filter != "All":
     filtered = filtered[filtered["level"] == level_filter]
 
-if therapy_filter != "None":
-    pose_ids = therapy[therapy["therapy_condition"] == therapy_filter]["pose_id"]
-    filtered = filtered[filtered["id"].isin(pose_ids)]
+
 #---------------------------------------------------------------------------------
 # Props filter
 if props_filter:
     pose_ids = props[props["prop"].isin(props_filter)]["pose_id"]
     filtered = filtered[filtered["id"].isin(pose_ids)]
 
+if therapy_filter != "None":
+    pose_ids = therapy[therapy["therapy_condition"] == therapy_filter]["pose_id"]
+    filtered = filtered[filtered["id"].isin(pose_ids)]
+    
 # Joint actions filter
 if joint_filter:
     pose_ids = bio[bio["joint_actions"].isin(joint_filter)]["pose_id"]
