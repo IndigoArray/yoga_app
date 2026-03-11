@@ -216,6 +216,13 @@ else:
         st.write("No sequencing data available.")
 
 
+#----------------------Navigation
+from utils.navigation import navigation_header
+
+navigation_header()
+
+st.title("🧘 Yoga Therapy App")
+
 #visualization
 #--------------------------------------------------------------------
 st.sidebar.write("### Visualizations")
