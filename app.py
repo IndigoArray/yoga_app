@@ -185,7 +185,7 @@ else:
                 
             
 
-        with tab2:
+    with tab2:
             st.markdown("#### Contraindications")
             pose_contra = contra[contra["pose_id"] == pose["id"]]
             if not pose_contra.empty:
@@ -195,7 +195,7 @@ else:
                 st.success("No specific contraindications listed. Always listen to your body.")
 
 
-        with tab3:
+    with tab3:
             st.markdown("#### Sequencing")
             pose_seq = seq[seq["pose_id"] == pose["id"]]
             if not pose_seq.empty:
@@ -203,7 +203,7 @@ else:
                 st.write(f"🟢 **Prep with:** {seq_row['prep_pose']}")
                 st.write(f"🔵 **Counter with:** {seq_row['counter_pose']}")
                 
-        with tab4:
+    with tab4:
 
             st.markdown("#### Biomechanics")
             bio_row = bio[bio["pose_id"] == pose["id"]].iloc[0] if not bio[bio["pose_id"] == pose["id"]].empty else None
@@ -218,11 +218,11 @@ else:
 #visualization
 st.divider()
 with st.expander("📊 Practice Insights & Data"):
-    col_v1, col_v2 = st.columns(2)
-    with col_v1:
+     col_v1, col_v2 = st.columns(2)
+with col_v1:
         st.write("🧘‍♀️Pose Distribution by Category")
         st.bar_chart(poses["category"].value_counts())
-    with col_v2:
+with col_v2:
         st.write("**Difficulty Distribution**")
         st.bar_chart(poses["level"].value_counts())
 
