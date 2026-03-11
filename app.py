@@ -45,7 +45,7 @@ def load_data():
     bio = pd.read_csv("data/biomechanics.csv")
     seq = pd.read_csv("data/sequencing.csv")
     return poses, variations, therapy, contra, props, bio, seq
-    poses, variations, therapy, contra, props, bio, seq = load_data()
+ poses, variations, therapy, contra, props, bio, seq = load_data()
 
 
 # 1. Make sure the variable is defined BEFORE line 58
