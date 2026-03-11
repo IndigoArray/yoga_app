@@ -41,7 +41,7 @@ level_filter = st.sidebar.selectbox(
 
 props_filter = st.sidebar.multiselect(
     "Props Needed",
-    sorted(props["prop"].unique())
+    sorted(props["props"].unique())
 )
 
 joint_filter = st.sidebar.multiselect(
