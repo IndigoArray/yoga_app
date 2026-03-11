@@ -2,7 +2,28 @@ import streamlit as st
 import pandas as pd
 import os
 
-st.title("🧘 Yoga Therapy App")
+#  Page Config 
+st.set_page_config(page_title="Yoga Everyday", page_icon="🧘", layout="wide")
+
+# css 
+st.markdown("""
+    <style>
+    .main { border-radius: 10px; }
+    .stMetric { background-color: #f0f2f6; padding: 10px; border-radius: 10px; }
+    .st-expander { border: none !important; box-shadow: none !important; }
+    /* Custom Card Style */
+    .pose-card {
+        padding: 20px;
+        border-radius: 15px;
+        border-left: 5px solid #6D8299;
+        background-color: #ffffff;
+        margin-bottom: 20px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("🧘 Yoga Everyday")
+
 
 #----------------------Navigation
 from utils.navigation import navigation_header
@@ -23,37 +44,36 @@ def load_data():
     props = pd.read_csv("data/props.csv")
     bio = pd.read_csv("data/biomechanics.csv")
     seq = pd.read_csv("data/sequencing.csv")
-    return poses, variations, therapy, contra, props, bio, seq
+    return poses, variations, therapy, contra, props, bio, seq poses, variations, therapy, contra, props, bio, seq = load_data()
 
-poses, variations, therapy, contra, props, bio, seq = load_data()
-
-# ---------------------------------------------------------
+# ------------------------------
 # Sidebar Filters
-# ---------------------------------------------------------
+# ------------------------------
 st.sidebar.header("Filters")
 
+st.header("✨ Refine Practice")
 category_filter = st.sidebar.selectbox(
     "Category",
     ["All"] + sorted(poses["category"].unique())
-)
-
-therapy_filter = st.sidebar.selectbox(
-    "Therapeutic Need",
-    ["None"] + sorted(therapy["therapy_condition"].unique())
 )
 
 level_filter = st.sidebar.selectbox(
     "Difficulty Level",
     ["All"] + sorted(poses["level"].unique())
 )
-#---------------------------------------------------------------
 
 props_filter = st.sidebar.multiselect(
     "Props Needed",
     sorted(props["prop"].dropna().unique())
 )
+#therapy
+#---------------------------------------------------------------
+with st.expander("🛠️ Anatomy & Therapy"):
 
-
+therapy_filter = st.sidebar.selectbox(
+    "Therapeutic Need",
+    ["None"] + sorted(therapy["therapy_condition"].unique())
+)
 joint_filter = st.sidebar.multiselect(
     "Joint Actions",
     sorted(bio["joint_actions"].dropna().unique())
@@ -69,6 +89,8 @@ plane_filter = st.sidebar.multiselect(
     sorted(bio["planes_of_movement"].dropna().unique())
 )
 
+#theme---
+    theme = st.selectbox("🎨 App Theme", ["Light", "Calm Blue", "Earth Brown", "Forest Green"])
 # ---------------------------------------------------------
 # Filter Logic
 # ---------------------------------------------------------
@@ -103,19 +125,18 @@ if muscle_filter:
 if plane_filter:
     pose_ids = bio[bio["planes_of_movement"].isin(plane_filter)]["pose_id"]
     filtered = filtered[filtered["id"].isin(pose_ids)]
+
+
+    
 # ---------------------------------------------------------
 # Pose Selection
 # ---------------------------------------------------------
-st.title("🧘 Yoga Therapy Pose Explorer")
-
-
-pose_names = filtered["english_name"].tolist()
-
+st.subheader("🧘 Explore Poses")
 
 if len(pose_names) == 0:
-    st.warning("No poses match your filters.")
+    st.warning("No poses match your filters.Try broadening your search!")
 else:
-    selected_pose = st.selectbox("Choose a pose", pose_names)
+    selected_pose = st.selectbox("Select a Pose to deepen your practice:", pose_names)
 
     pose = poses[poses["english_name"] == selected_pose].iloc[0]
 
@@ -123,120 +144,84 @@ else:
     # Display Pose Information
     # ---------------------------------------------------------
 
-    # Create columns with 1:2 ratio
-col1, col2 = st.columns([1, 2])
+    # Create columns with gap and ratio 1:1.5
 
+    col1, col2 = st.columns([1, 1.5], gap="large")
 # Handle the image path
-image_path = os.path.join("images", pose["image_path"])
-
-with col1:
-    if os.path.exists(image_path):
-        # use_container_width makes it responsive and "cleaner" than a fixed 300px
-        st.image(image_path, use_container_width=True)
-    else:
-        st.info("📷 Image not found in /images folder.")
+    with col1:
+        image_path = os.path.join("images", pose["image_path"])
+        if os.path.exists(image_path):
+            st.image(image_path, use_container_width=True, caption=pose['sanskrit_name'])
+        else:
+            st.info("📷 Image preview coming soon.")
+            
+        # Quick Stats under image
+        c1, c2 = st.columns(2)
+        c1.metric("Level", pose['level'])
+        c2.metric("Category", pose['category'])
 
 with col2:
-    # Title and Sanskrit Name
-    st.subheader(f"{pose['english_name']} | {pose['sanskrit_name']}")
-    
-    # Using an 'info' box for metadata keeps it visually separated from the description
-    st.info(f"**Level:** {pose['level']}  |  **Category:** {pose['category']}")
-    
-    st.markdown("### Description")
-    st.write(pose["description"])
+        st.title(f"{pose['english_name']} | {pose['sanskrit_name']}")
+        st.write(pose["description"])
+        # Using an 'info' box for metadata keeps it visually separated from the description
+        st.info(f"**Level:** {pose['level']}  |  **Category:** {pose['category']}")
+        
+        # Using Tabs to organize dense information
+        tab1, tab2, tab3, tab4 = st.tabs(["🛠️ Practice & Props", "⚠️ Safety", "🔄 Flow","💡 Benefits & Anatomy"])
+
+        with tab1:
+            st.markdown("#### Props & Modifications")
+            pose_props = props[props["pose_id"] == pose["id"]]
+            if not pose_props.empty:
+                st.dataframe(pose_props[["prop", "usage"]], use_container_width=True, hide_index=True)
+            
+            st.markdown("#### Variations")
+            pose_vars = variations[variations["pose_id"] == pose["id"]]
+            if not pose_vars.empty:
+                st.table(pose_vars[["variation_type", "description"]])
+                
+            
+
+        with tab2:
+            st.markdown("#### Contraindications")
+            pose_contra = contra[contra["pose_id"] == pose["id"]]
+            if not pose_contra.empty:
+                for item in pose_contra["contraindication"]:
+                    st.error(f"**Be careful if:** {item}")
+            else:
+                st.success("No specific contraindications listed. Always listen to your body.")
 
 
-    # ---------------------------------------------------------
-    # Variations
-    # ---------------------------------------------------------
-    st.write("### Variations")
-    pose_variations = variations[variations["pose_id"] == pose["id"]]
-    if len(pose_variations) > 0:
-        st.table(pose_variations[["variation_type", "description"]])
-    else:
-        st.write("No variations available.")
+        with tab3:
+            st.markdown("#### Sequencing")
+            pose_seq = seq[seq["pose_id"] == pose["id"]]
+            if not pose_seq.empty:
+                seq_row = pose_seq.iloc[0]
+                st.write(f"🟢 **Prep with:** {seq_row['prep_pose']}")
+                st.write(f"🔵 **Counter with:** {seq_row['counter_pose']}")
+                
+        with tab4:
 
-    # ---------------------------------------------------------
-    # Therapeutic Uses
-    # ---------------------------------------------------------
-    st.write("### Therapeutic Uses")
-    pose_therapy = therapy[therapy["pose_id"] == pose["id"]]
-    if len(pose_therapy) > 0:
-        st.write(", ".join(pose_therapy["therapy_condition"].tolist()))
-    else:
-        st.write("No therapeutic uses listed.")
+            st.markdown("#### Biomechanics")
+            bio_row = bio[bio["pose_id"] == pose["id"]].iloc[0] if not bio[bio["pose_id"] == pose["id"]].empty else None
+            if bio_row is not None:
+                st.write(f"**Muscles:** {bio_row['muscles_activated']}")
+                st.write(f"**Focus:** {bio_row['joint_actions']}")
+            
+            st.markdown("#### Therapeutic Uses")
+            pose_therapy = therapy[therapy["pose_id"] == pose["id"]]
+            st.write(", ".join(pose_therapy["therapy_condition"].tolist()) if not pose_therapy.empty else "General wellness")
 
-    # ---------------------------------------------------------
-    # Contraindications
-    # ---------------------------------------------------------
-    st.write("### Contraindications")
-    pose_contra = contra[contra["pose_id"] == pose["id"]]
-    if len(pose_contra) > 0:
-        st.write(", ".join(pose_contra["contraindication"].tolist()))
-    else:
-        st.write("No contraindications listed.")
-
-    # ---------------------------------------------------------
-    # Props
-    # ---------------------------------------------------------
-    st.write("### Props")
-    pose_props = props[props["pose_id"] == pose["id"]]
-    if len(pose_props) > 0:
-        st.table(pose_props[["prop", "usage"]])
-    else:
-        st.write("No props listed.")
-
-    # ---------------------------------------------------------
-    # Biomechanics
-    # ---------------------------------------------------------
-    st.write("### Biomechanics")
-    pose_bio = bio[bio["pose_id"] == pose["id"]]
-    if len(pose_bio) > 0:
-        bio_row = pose_bio.iloc[0]
-        st.write("**Joint Actions:**", bio_row["joint_actions"])
-        st.write("**Muscles Activated:**", bio_row["muscles_activated"])
-        st.write("**Muscles Stretched:**", bio_row["muscles_stretched"])
-        st.write("**Planes of Movement:**", bio_row["planes_of_movement"])
-    else:
-        st.write("No biomechanics data available.")
-
-    # ---------------------------------------------------------
-    # Sequencing
-    # ---------------------------------------------------------
-    st.write("### Sequencing")
-    pose_seq = seq[seq["pose_id"] == pose["id"]]
-    if len(pose_seq) > 0:
-        seq_row = pose_seq.iloc[0]
-        st.write("**Prep Pose:**", seq_row["prep_pose"])
-        st.write("**Counter Pose:**", seq_row["counter_pose"])
-    else:
-        st.write("No sequencing data available.")
-
-#theme
-
-theme = st.sidebar.selectbox(
-    "Theme",
-    ["Light", "Calm Blue", "Earth Brown", "Forest Green"]
-)
-
-theme_colors = {
-    "Light": "#FFFFFF",
-    "Calm Blue": "#E3F2FD",
-    "Earth Brown": "#EFEBE9",
-    "Forest Green": "#E8F5E9"
-}
-
-st.markdown(
-    f"""
-    <style>
-        .main {{
-            background-color: {theme_colors[theme]};
-        }}
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+#visualization
+st.divider()
+with st.expander("📊 Practice Insights & Data"):
+    col_v1, col_v2 = st.columns(2)
+    with col_v1:
+        st.write("🧘‍♀️Pose Distribution by Category")
+        st.bar_chart(poses["category"].value_counts())
+    with col_v2:
+        st.write("**Difficulty Distribution**")
+        st.bar_chart(poses["level"].value_counts())
 
 
 
