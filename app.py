@@ -126,6 +126,7 @@ else:
     st.subheader(pose["sanskrit_name"])
 
     image_path = os.path.join("images", pose["image_path"])
+    st.image("images/mountain_pose_watercolor.png", width=300)
     if os.path.exists(image_path):
         st.image(image_path, use_column_width=True)
     else:
