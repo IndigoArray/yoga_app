@@ -71,24 +71,24 @@ props_filter = st.sidebar.multiselect(
 #---------------------------------------------------------------
 with st.expander("🛠️ Anatomy & Therapy"):
 
-therapy_filter = st.sidebar.selectbox(
+    therapy_filter = st.sidebar.selectbox(
     "Therapeutic Need",
     ["None"] + sorted(therapy["therapy_condition"].unique())
-)
-joint_filter = st.sidebar.multiselect(
-    "Joint Actions",
-    sorted(bio["joint_actions"].dropna().unique())
-)
+    )
+    joint_filter = st.sidebar.multiselect(
+        "Joint Actions",
+        sorted(bio["joint_actions"].dropna().unique())
+    )
 
-muscle_filter = st.sidebar.multiselect(
-    "Muscles Activated",
-    sorted(bio["muscles_activated"].dropna().unique())
-)
+    muscle_filter = st.sidebar.multiselect(
+        "Muscles Activated",
+        sorted(bio["muscles_activated"].dropna().unique())
+    )
 
-plane_filter = st.sidebar.multiselect(
-    "Planes of Movement",
-    sorted(bio["planes_of_movement"].dropna().unique())
-)
+    plane_filter = st.sidebar.multiselect(
+        "Planes of Movement",
+        sorted(bio["planes_of_movement"].dropna().unique())
+    )
 
 #theme---
     theme = st.selectbox("🎨 App Theme", ["Light", "Calm Blue", "Earth Brown", "Forest Green"])
@@ -163,7 +163,7 @@ else:
         c1.metric("Level", pose['level'])
         c2.metric("Category", pose['category'])
 
-with col2:
+ with col2:
         st.title(f"{pose['english_name']} | {pose['sanskrit_name']}")
         st.write(pose["description"])
         # Using an 'info' box for metadata keeps it visually separated from the description
