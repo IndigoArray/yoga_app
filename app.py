@@ -10,7 +10,7 @@ st.markdown("""
     <style>
     .stApp { background-color: #fcfaf8; }
     .main { border-radius: 10px; }
-    .stMetric { background-color: #ffffff; padding: 15px; border-radius: 12px; border: 1px solid #e6e9ef; }
+    .stMetric { background-color: #ffffee; padding: 15px; border-radius: 12px; border: 1px solid #e6e9ef; }
     .pose-header { color: #2c3e50; font-family: 'Helvetica Neue', sans-serif; }
     </style>
 """, unsafe_allow_html=True)
