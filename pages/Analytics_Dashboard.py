@@ -2,6 +2,14 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 
+#navigation
+from utils.navigation import navigation_header
+
+navigation_header()
+
+st.title("📊 Yoga Therapy Analytics Dashboard")
+
+
 # Load Data
 # ---------------------------------------------------------
 @st.cache_data
