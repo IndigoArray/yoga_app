@@ -2,6 +2,15 @@ import streamlit as st
 import pandas as pd
 import os
 
+st.title("🧘 Yoga Therapy App")
+
+#----------------------Navigation
+from utils.navigation import navigation_header
+
+navigation_header()
+
+
+
 # ---------------------------------------------------------
 # Load CSV files
 # ---------------------------------------------------------
@@ -37,6 +46,28 @@ level_filter = st.sidebar.selectbox(
     "Difficulty Level",
     ["All"] + sorted(poses["level"].unique())
 )
+#---------------------------------------------------------------
+
+props_filter = st.sidebar.multiselect(
+    "Props Needed",
+    sorted(props["prop"].dropna().unique())
+)
+
+
+joint_filter = st.sidebar.multiselect(
+    "Joint Actions",
+    sorted(bio["joint_actions"].dropna().unique())
+)
+
+muscle_filter = st.sidebar.multiselect(
+    "Muscles Activated",
+    sorted(bio["muscles_activated"].dropna().unique())
+)
+
+plane_filter = st.sidebar.multiselect(
+    "Planes of Movement",
+    sorted(bio["planes_of_movement"].dropna().unique())
+)
 
 # ---------------------------------------------------------
 # Filter Logic
@@ -52,13 +83,34 @@ if level_filter != "All":
 if therapy_filter != "None":
     pose_ids = therapy[therapy["therapy_condition"] == therapy_filter]["pose_id"]
     filtered = filtered[filtered["id"].isin(pose_ids)]
+#---------------------------------------------------------------------------------
+# Props filter
+if props_filter:
+    pose_ids = props[props["prop"].isin(props_filter)]["pose_id"]
+    filtered = filtered[filtered["id"].isin(pose_ids)]
 
+# Joint actions filter
+if joint_filter:
+    pose_ids = bio[bio["joint_actions"].isin(joint_filter)]["pose_id"]
+    filtered = filtered[filtered["id"].isin(pose_ids)]
+
+# Muscles activated filter
+if muscle_filter:
+    pose_ids = bio[bio["muscles_activated"].isin(muscle_filter)]["pose_id"]
+    filtered = filtered[filtered["id"].isin(pose_ids)]
+
+# Planes of movement filter
+if plane_filter:
+    pose_ids = bio[bio["planes_of_movement"].isin(plane_filter)]["pose_id"]
+    filtered = filtered[filtered["id"].isin(pose_ids)]
 # ---------------------------------------------------------
 # Pose Selection
 # ---------------------------------------------------------
 st.title("🧘 Yoga Therapy Pose Explorer")
 
+
 pose_names = filtered["english_name"].tolist()
+
 
 if len(pose_names) == 0:
     st.warning("No poses match your filters.")
@@ -147,3 +199,47 @@ else:
         st.write("**Counter Pose:**", seq_row["counter_pose"])
     else:
         st.write("No sequencing data available.")
+
+#theme
+
+theme = st.sidebar.selectbox(
+    "Theme",
+    ["Light", "Calm Blue", "Earth Brown", "Forest Green"]
+)
+
+theme_colors = {
+    "Light": "#FFFFFF",
+    "Calm Blue": "#E3F2FD",
+    "Earth Brown": "#EFEBE9",
+    "Forest Green": "#E8F5E9"
+}
+
+st.markdown(
+    f"""
+    <style>
+        .main {{
+            background-color: {theme_colors[theme]};
+        }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+
+#visualization
+#--------------------------------------------------------------------
+st.sidebar.write("### Visualizations")
+
+if st.sidebar.checkbox("Show Pose Statistics"):
+    st.subheader("📊 Pose Distribution by Category")
+    st.bar_chart(poses["category"].value_counts())
+
+    st.subheader("📈 Difficulty Level Distribution")
+    st.bar_chart(poses["level"].value_counts())
+
+    st.subheader("🧰 Props Usage Frequency")
+    st.bar_chart(props["prop"].value_counts())
+
+    st.subheader("❤️ Therapy Conditions Count")
+    st.bar_chart(therapy["therapy_condition"].value_counts())
